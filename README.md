@@ -35,7 +35,7 @@ Crapptorio is a resource mining and processing simulation game. Where the player
 4. **Automation of Processes:**
     - Click the `Start Processing` button to enable automatic resource transport and processing at factories.
 5. **Reset the Grid** :
-- Click the `Reroll Grid` button to reset the grid and spawn new clusters of resources.
+    - Click the `Reroll Grid` button to reset the grid and spawn new clusters of resources.
 
 ---
 
