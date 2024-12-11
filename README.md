@@ -20,7 +20,8 @@ Crapptorio is a resource mining and processing simulation game. Where the player
 - Various buildings, e.g. Smelters, Constructors, Oil pumps.
 
 ### Wireframe Version 01
-![Wireframe Version 01](https://github.com/Tangeyo/Crapptorio/raw/main/Wireframes/Wireframe01.png)
+<img src="https://github.com/Tangeyo/Crapptorio/raw/main/Wireframes/Wireframe01.png" alt="Example Image" width="400" height="700"/>
+
 
 
 ## Features
