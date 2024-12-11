@@ -11,6 +11,7 @@ struct ContentView: View {
         case conveyorLeft
         case conveyorUp
         case conveyorDown
+        case miner
     }
     
     var body: some View {
@@ -33,8 +34,7 @@ struct ContentView: View {
             }
             .padding()
             
-            //buttons for each of the tiles the user can select to play as
-            //with debug statements
+            //buttons for each of the tiles the user can select to play as + debug statements
             VStack(spacing: 10) {
                 HStack {
                     Button(action: {
@@ -48,6 +48,19 @@ struct ContentView: View {
                             .cornerRadius(8)
                     }
                     
+                    Button(action: {
+                        selectedTileType = .miner
+                        print("Selected tile type: Miner")
+                    }) {
+                        Text("Miner")
+                            .padding()
+                            .background(selectedTileType == .miner ? Color.yellow.opacity(0.7) : Color.gray.opacity(0.3))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                }
+                
+                HStack {
                     Button(action: {
                         selectedTileType = .conveyorRight
                         print("Selected tile type: Conveyor Right")
@@ -96,32 +109,21 @@ struct ContentView: View {
                 //buttons for actions
                 HStack {
                     Button(action: {
+                        gameState.toggleProcessing() //correct method to toggle processing
+                        print("Start Processing has been toggled")
+                    }) {
+                        Text(gameState.isProcessing ? "Stop Processing" : "Start Processing") //updates text dynamically
+                            .padding()
+                            .background(gameState.isProcessing ? Color.red : Color.green) //changes color to indicate state
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    
+                    Button(action: {
                         rerollGrid()
                         print("Grid has been rerolled")
                     }) {
                         Text("Reroll Grid")
-                            .padding()
-                            .background(Color.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                    }
-                    
-                    Button(action: {
-                        gameState.startProcessing()
-                        print("Start Processing has been pressed")
-                    }) {
-                        Text("Start Processing")
-                            .padding()
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                    }
-                    
-                    Button(action: {
-                        resetGrid()
-                        print("Grid has been reset")
-                    }) {
-                        Text("Reset Grid")
                             .padding()
                             .background(Color.red)
                             .foregroundColor(.white)
@@ -146,25 +148,18 @@ struct ContentView: View {
             gameState.placeConveyor(at: row, col: col, direction: .up)
         case .conveyorDown:
             gameState.placeConveyor(at: row, col: col, direction: .down)
+        case .miner:
+            gameState.placeMiner(at: row, col: col)
         }
     }
     
-    //function to reset the grid to all empty tiles and regenerate resource clusters
-    private func resetGrid() {
+    //function to reroll the grid to all empty tiles and regenerate resource clusters
+    private func rerollGrid() {
         for row in 0..<gameState.grid.count {
             for col in 0..<gameState.grid[row].count {
                 gameState.grid[row][col] = Tile(type: .empty, resourceCount: 0)
             }
         }
-        //somehow maintain resources?
-    }
-    
-    private func rerollGrid() {
-        for row in 0..<gameState.grid.count {
-            for col in 0..<gameState.grid.count {
-                gameState.grid[row][col] = Tile(type: .empty, resourceCount: 0)
-            }
-        }
-        gameState.spawnResourceClusters()  //regenerate resource clusters after reset
+        gameState.spawnResourceClusters()  //regenerate resource clusters after reroll
     }
 }

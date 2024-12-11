@@ -14,8 +14,17 @@ struct TileView: View {
                         .bold()
                         .foregroundColor(.white)
                 )
-            
-            
+
+            if tile.resourceCount > 0 {
+                Text("\(tile.resourceCount)")
+                    .font(.caption)
+                    .foregroundColor(.black)
+                    .padding(4)
+                    .background(Color.white.opacity(0.8))
+                    .cornerRadius(5)
+                    .offset(x: 0, y: 18)
+            }
+
             if case .factory = tile.type {
                 Text("\(tile.processedCount)")
                     .font(.caption)
@@ -23,7 +32,7 @@ struct TileView: View {
                     .padding(4)
                     .background(Color.white.opacity(0.8))
                     .cornerRadius(5)
-                    .offset(x: 0, y: 18) //offset for below the factory symbol
+                    .offset(x: 0, y: -18)
             }
         }
     }
@@ -41,6 +50,8 @@ struct TileView: View {
             return Color.orange
         case .processed:
             return Color.purple
+        case .miner:
+            return Color.yellow
         }
     }
     
@@ -51,12 +62,14 @@ struct TileView: View {
             return ""
         case .factory:
             return "🏭"
-        case let .conveyor(direction): //for tile rotation
+        case let .conveyor(direction):
             return direction.arrow
         case .resource:
             return "🪨"
         case .processed:
             return "⚙️"
+        case .miner:
+            return "⛏️"
         }
     }
 }

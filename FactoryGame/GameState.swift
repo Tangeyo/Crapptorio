@@ -23,10 +23,11 @@ enum TileType: Equatable {
     case conveyor(direction: Direction)
     case resource
     case processed
-    
+    case miner
+
     static func == (lhs: TileType, rhs: TileType) -> Bool {
         switch (lhs, rhs) {
-        case (.empty, .empty), (.factory, .factory), (.resource, .resource), (.processed, .processed):
+        case (.empty, .empty), (.factory, .factory), (.resource, .resource), (.processed, .processed), (.miner, .miner):
             return true
         case (.conveyor(let lhsDirection), .conveyor(let rhsDirection)):
             return lhsDirection == rhsDirection
@@ -40,12 +41,12 @@ enum TileType: Equatable {
 struct Tile: Identifiable {
     let id = UUID()
     var type: TileType
-    var resourceCount: Int = 0  //track resources on this tile
-    var processedCount: Int = 0 //track number of resources processed (for factories)
-    
+    var resourceCount: Int = 0
+    var processedCount: Int = 0
+
     func canAcceptResource() -> Bool {
         switch type {
-        case .conveyor, .factory:
+        case .conveyor, .factory, .miner:
             return true
         default:
             return false
@@ -53,9 +54,10 @@ struct Tile: Identifiable {
     }
 }
 
-//game state that will manage the grid and gameplay logic
+
 class GameState: ObservableObject {
     @Published var grid: [[Tile]]
+    @Published var isProcessing: Bool = false
     let gridSize: Int
     
     init(gridSize: Int = 7) {
@@ -75,14 +77,29 @@ class GameState: ObservableObject {
         guard isValidPosition(row: row, col: col) else { return }
         grid[row][col] = Tile(type: .conveyor(direction: direction), resourceCount: grid[row][col].resourceCount)
     }
-    
-    //function to start processing: move resources and process factories
-    func startProcessing() {
-        moveResources()
-        processFactories()
+
+    func placeMiner(at row: Int, col: Int) {
+        guard isValidPosition(row: row, col: col), grid[row][col].type == .resource else { return }
+        grid[row][col] = Tile(type: .miner, resourceCount: grid[row][col].resourceCount)
     }
-    
-    //function to move resources along conveyors
+
+    func toggleProcessing() {
+        isProcessing.toggle()
+        if isProcessing {
+            processAutomatically()
+        }
+    }
+
+    private func processAutomatically() {
+        guard isProcessing else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.moveResources()
+            self.processFactories()
+            self.processAutomatically()
+        }
+    }
+
     private func moveResources() {
         var newGrid = grid
         
@@ -102,9 +119,20 @@ class GameState: ObservableObject {
                         }
                     }
                 }
-                
-                if case .resource = tile.type, tile.resourceCount == 0 {
-                    newGrid[row][col].resourceCount = 1
+
+                //handle miners
+                if case .miner = tile.type, tile.resourceCount > 0 {
+                    //miners push resources to adjacent conveyors in any direction
+                    for direction in [Direction.up, Direction.down, Direction.left, Direction.right] {
+                        let (nextRow, nextCol) = nextPosition(row: row, col: col, direction: direction)
+
+                        if isValidPosition(row: nextRow, col: nextCol),
+                           case .conveyor = grid[nextRow][nextCol].type {
+                            newGrid[nextRow][nextCol].resourceCount += 1
+                            newGrid[row][col].resourceCount -= 1
+                            break //stop after moving one resource
+                        }
+                    }
                 }
             }
         }
@@ -114,32 +142,37 @@ class GameState: ObservableObject {
     
     //function to process factories: convert resources into processed items
     private func processFactories() {
-        var newGrid = grid
-        
         for row in 0..<gridSize {
             for col in 0..<gridSize {
                 let tile = grid[row][col]
-                
+
                 if tile.type == .factory, tile.resourceCount > 0 {
-                    newGrid[row][col].resourceCount -= 1
-                    newGrid[row][col].processedCount += 1  //increment processed count
-                    newGrid[row][col].type = .processed
-                }
-                
-                if tile.type == .processed {
-                    newGrid[row][col].type = .factory
+                    grid[row][col].resourceCount -= 1
+                    grid[row][col].processedCount += 1
+                    grid[row][col].type = .processed
+                } else if tile.type == .processed {
+                    grid[row][col].type = .factory
                 }
             }
         }
-        
-        grid = newGrid
     }
-    
-    //function to spawn random resource clusters on the grid
+
+    func resetGrid() {
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                if case .factory = grid[row][col].type {
+                    grid[row][col] = Tile(type: .empty)
+                } else if case .conveyor = grid[row][col].type {
+                    grid[row][col] = Tile(type: .empty)
+                }
+            }
+        }
+    }
+    //spawn clusters for rerolls
     func spawnResourceClusters() {
-        let clusterCount = Int.random(in: 3...5)  //randomly choose 3 to 5 clusters
+        let clusterCount = Int.random(in: 3...5)
         for _ in 0..<clusterCount {
-            let clusterSize = Int.random(in: 3...5)  //each cluster has 3 to 5 tiles
+            let clusterSize = Int.random(in: 3...5)
             placeRandomCluster(of: clusterSize)
         }
     }
