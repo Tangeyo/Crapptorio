@@ -2,7 +2,6 @@
 
 Crapptorio is a resource mining and processing simulation game. Where the player on a 2D grid, places tiles to move, transport, and process resources in the most efficient way; to maximize the rate of output of the processed goods and convert them into more sophisticated goods!
 
----
 ## Features
 
 ### Gameplay
@@ -19,8 +18,6 @@ Crapptorio is a resource mining and processing simulation game. Where the player
 - **Resource Clusters**: Random Generation of Deposits of raw materials to be mined with `Reroll grid`.
 - **Automation**: Recursive automated processing with `Start processing`.
 
----
-
 ## How to Play
 
 1. **Start of Game**:
@@ -36,8 +33,6 @@ Crapptorio is a resource mining and processing simulation game. Where the player
     - Click the `Start Processing` button to enable automatic resource transport and processing at factories.
 5. **Reset the Grid** :
     - Click the `Reroll Grid` button to reset the grid and spawn new clusters of resources.
-
----
 
 ## Technical Implementation
 
@@ -91,7 +86,6 @@ It provides the grid (2D array) of Tile objects and specifies methods for placin
 **Randomization**:
 - The `spawnResourceClusters()` function generates 3 to 5 random clusters of resource tiles on the grid. Each cluster has 3 to 5 resource tiles placed at random empty positions. Each resource tile gets a random quantity (1 to 3), and each subsequent tile in the cluster is placed adjacent to the previous one.
 
----
 ## Todos
 
 - Add score and levels for challenging the players.
@@ -101,13 +95,9 @@ It provides the grid (2D array) of Tile objects and specifies methods for placin
 - Ore -> Miner -> Conveyor -> Furnace -> Conveyor -> Resource Processor
 - Add a sandbox mode for free play where the player can be allowed to create their own grid.
  
----
- 
 ## Run
 
 1. Clone this repo.
 2. Open the project up in Xcode.
 3. Build and run selecting the latest iPhone model. (15 pro used for simulation)
 4. Start placing tiles, manage resources, and enjoy the game!
-
----
