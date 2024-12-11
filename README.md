@@ -2,6 +2,27 @@
 
 Crapptorio is a resource mining and processing simulation game. Where the player on a 2D grid, places tiles to move, transport, and process resources in the most efficient way; to maximize the rate of output of the processed goods and convert them into more sophisticated goods!
 
+## Initial Proposal
+
+### Must have Requirements
+- Playable grid area for placing tiles.
+- Conveyors that move resources.
+- Factories to process resources.
+- Clusters of Ore.
+- A processing button to start "timing".
+
+### Nice to have Requirements
+- Miners that bridge the gap between conveyor and ore.
+- Automated Processing.
+- Randomly generated clusters.
+- Levels.
+- Directional Conveyors.
+- Various buildings, e.g. Smelters, Constructors, Oil pumps.
+
+### Wireframe Version 01
+![Wireframe Version 01](https://github.com/Tangeyo/Crapptorio/raw/main/Wireframes/Wireframe01.png)
+
+
 ## Features
 
 ### Gameplay
