@@ -108,7 +108,7 @@ It provides the grid (2D array) of Tile objects and specifies methods for placin
     - It contains helper methods such as `canAcceptResource()` to determine if a certain type of tile can hold/ process resources. This helper method is used in various other functions such as `moveResources()` to check the tile state.
 
 **Randomization**:
-- The `spawnResourceClusters()` function generates 3 to 5 random clusters of resource tiles on the grid. Each cluster has 3 to 5 resource tiles placed at random empty positions. Each resource tile gets a random quantity (1 to 3), and each subsequent tile in the cluster is placed adjacent to the previous one.
+- The `spawnResourceClusters()` function generates 3 to 5 random clusters of resource tiles on the grid. Each resource tile gets a random quantity (1 to 3), and each subsequent tile in the cluster is placed adjacent to the previous one.
 
 ## Todos
 
