@@ -60,10 +60,33 @@ class GameState: ObservableObject {
     @Published var isProcessing: Bool = false
     let gridSize: Int
     
+    //track score based on processed resources
+    @Published var score: Int = 0
+    @Published var maxScore: Int = 0 //track the highest score
     init(gridSize: Int = 7) {
         self.gridSize = gridSize
         self.grid = Array(repeating: Array(repeating: Tile(type: .empty), count: gridSize), count: gridSize)
-        spawnResourceClusters()  // Spawn resource clusters when the game initializes
+        spawnResourceClusters()  //spawn resource clusters when the game initializes
+    }
+    
+    //add a function to update the score
+    private func updateScore() {
+        score = 0
+        //loop through the entire grid to sum up the processed counts
+        for row in 0..<gridSize {
+            for col in 0..<gridSize {
+                let tile = grid[row][col]
+                //if the tile is of type 'processed', add its processedCount to the score
+                if case .processed = tile.type {
+                    score += tile.processedCount
+                }
+            }
+        }
+        
+        //update maxScore if the current score is higher to retain highest score on screen
+        if score > maxScore {
+            maxScore = score
+        }
     }
     
     //function to place a factory on the grid
@@ -125,7 +148,6 @@ class GameState: ObservableObject {
                     //miners push resources to adjacent conveyors in any direction
                     for direction in [Direction.up, Direction.down, Direction.left, Direction.right] {
                         let (nextRow, nextCol) = nextPosition(row: row, col: col, direction: direction)
-
                         if isValidPosition(row: nextRow, col: nextCol),
                            case .conveyor = grid[nextRow][nextCol].type {
                             newGrid[nextRow][nextCol].resourceCount += 1
@@ -144,19 +166,26 @@ class GameState: ObservableObject {
     private func processFactories() {
         for row in 0..<gridSize {
             for col in 0..<gridSize {
-                let tile = grid[row][col]
-
+                var tile = grid[row][col]
+                
                 if tile.type == .factory, tile.resourceCount > 0 {
-                    grid[row][col].resourceCount -= 1
-                    grid[row][col].processedCount += 1
-                    grid[row][col].type = .processed
+                    tile.resourceCount -= 1
+                    tile.processedCount += 1
+                    tile.type = .processed  //after processing, change the tile to 'processed'
                 } else if tile.type == .processed {
-                    grid[row][col].type = .factory
+                    //change processed tiles back to factory to allow processing again
+                    tile.type = .factory
                 }
+                
+                // Update the grid with the new tile state
+                grid[row][col] = tile
             }
         }
+        
+        //now, after processing all factories, update the their score
+        updateScore()
     }
-
+    
     func resetGrid() {
         for row in 0..<gridSize {
             for col in 0..<gridSize {
@@ -212,4 +241,35 @@ class GameState: ObservableObject {
     private func isValidPosition(row: Int, col: Int) -> Bool {
         return row >= 0 && row < gridSize && col >= 0 && col < gridSize
     }
+    
+    
+    func removeTile(at row: Int, col: Int) {
+        guard isValidPosition(row: row, col: col) else { return }
+
+        //remove the tiles except for resources
+        if case .resource = grid[row][col].type {
+            return
+        }
+
+        //set the tile to empty
+        grid[row][col] = Tile(type: .empty)
+    }
+
+    
+    func reset() {
+            //reset the score
+            maxScore = 0
+            
+            //reset the processing state
+            isProcessing = false
+            
+            //clear the grid, reset it to empty tiles
+            for row in 0..<grid.count {
+                for col in 0..<grid[row].count {
+                    grid[row][col] = Tile(type: .empty, resourceCount: 0)
+                }
+            }
+            //generate new resources
+            spawnResourceClusters()
+        }
 }
