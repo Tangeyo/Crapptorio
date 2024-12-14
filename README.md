@@ -112,9 +112,9 @@ This grid is dynamically generated from the `gameState.grid` array; each cell-a 
 
 ## Todos
 
-- Add score and levels for challenging the players.
+- ~~Add score and levels for challenging the players.~~ ✅
 - Pre-set Factories players need to move resources to.
-- Start Screen + Win screen at no more ore completion.
+- ~~Start Screen + Win screen at no more ore completion.~~ ✅
 - Expand tile types for more complex resource management like different types of factories, or resource types.
 - Ore -> Miner -> Conveyor -> Furnace -> Conveyor -> Resource Processor
 - Add a sandbox mode for free play where the player can be allowed to create their own grid.
